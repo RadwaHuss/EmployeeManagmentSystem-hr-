@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script>
+            function getWeekdays(startDate, endDate) {
+          // Copy start and end dates so we don't modify the originals
+          let start = new Date(startDate.getTime());
+          let end = new Date(endDate.getTime());
+
+          // Swap dates if start is after end
+          if (start > end) {
+            [start, end] = [end, start];
+          }
+
+          // Set initial count of weekdays to 0
+          let count = 0;
+
+          // Loop through each day between start and end
+          while (start <= end) {
+            // Check if day is a weekday (Monday = 1, Saturday = 6, Sunday = 0)
+            if (start.getDay() !== 5 && start.getDay() !== 6) {
+              count++;
+            }
+            // Move on to next day
+            start.setDate(start.getDate() + 1);
+          }
+
+          // Return count of weekdays
+          return count;
+        }
+
+        function calculateWeekdays() {
+      // Get start and end date inputs
+      const startDateInput = document.getElementById('start-date');
+      const endDateInput = document.getElementById('end-date');
+
+      // Convert input values to Date objects
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
+
+      // Calculate weekdays between start and end date
+      const weekdays = getWeekdays(startDate, endDate);
+      console.log(weekdays);
+
+      // Display result
+      const resultElement = document.getElementById('days');
+      resultElement.value = weekdays;
+    }
+
+    </script>
+    <title>Employee Leave Balances</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 19%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .green {
+            color: green;
+            font-weight: bold;
+        }
+
+        .yellow {
+            color: orange;
+        }
+
+        .red {
+            color: red;
+        }
+
+        label {
+          font-weight: bold;
+          margin-right: 10px;
+          color: red;
+          font-size: 30px;
+        }
+
+        select {
+          padding: 8px;
+          font-size: 16px;
+          border: none;
+          border-radius: 5px;
+          background-color: #eee;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        select:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          background-color: #ddd;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<!--select Vacation Type-->
+<form th:action="@{/vacation}" method="post">
+    <label for="vacation-type">Select vacation type:</label>
+    <br><br>
+    Type:
+    <select id="vacation-type" name="vacationType">
+        <option value="Annual">Annual</option>
+        <option value="Sick">Sick</option>
+    </select>
+    <br><br>
+    --------------------------------------------------------------------
+    <br><br>
+    <label for="vacation-type">Create request details:</label>
+    <br><br>
+    <span for="start-date">Start date:</span>
+    <input type="date" id="start-date" name="startDate" required onchange="calculateWeekdays()">
+    <br><br>
+    <span for="end-date">End date:</span>
+    <input type="date" id="end-date" name="endDate" required onchange="calculateWeekdays()">
+    <br><br>
+    <div th:if="${datesError != null}">
+        <p th:text="${datesError}"></p>
+    </div>
+    <span for="remaining-days">Days</span>
+    <input type="number" id="days" name="days" disabled="true">
+    <br><br>
+    <button type="submit" onclick="calculateWeekdays()">Submit</button>
+    <br><br>
+    --------------------------------------------------------------------
+    <br><br>
+</form>
+<label for="vacation-type">Select vacation type:</label>
+<br><br>
+<table>
+    <thead>
+    <tr>
+        <th>Type</th>
+        <th>Balance</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Annual</td>
+        <td th:text="${Annual.days}"></td>
+    </tr>
+    <tr>
+        <td>Sick</td>
+        <td th:text="${Sick.days}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${balanceError != null}">
+    <p th:text="${balanceError}" style="color: red; font-weight: bold;"></p>
+
+</div>
+
+</body>
+
+</html>
